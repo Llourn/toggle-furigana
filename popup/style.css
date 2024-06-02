@@ -1,0 +1,77 @@
+:root {
+  --color-brand: #e5418b;
+  --color-white: #fff;
+  --color-bg: #2c2d44;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0px;
+  text-rendering: geometricprecision;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  font-family: Inter, "Noto Sans JP", "ヒラギノ角ゴ Pro W3",
+    "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック",
+    "MS PGothic", sans-serif;
+  margin: 1rem;
+}
+
+.title {
+  width: 100%;
+  text-align: center;
+  padding-bottom: 0.5rem;
+}
+
+.btn-container {
+  text-align: center;
+}
+
+.btn-container button {
+  background-color: transparent !important;
+  border: medium !important;
+  border-radius: 4px;
+  display: inline-block;
+  user-select: none;
+}
+
+.btn-container button span {
+  appearance: none;
+  -moz-box-align: center;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  font-family: Inter, "Noto Sans JP", "ヒラギノ角ゴ Pro W3",
+    "Hiragino Kaku Gothic Pro", Osaka, "メイリオ", Meiryo, "ＭＳ Ｐゴシック",
+    "MS PGothic", sans-serif;
+  font-size: 12px;
+  -moz-box-pack: center;
+  justify-content: center;
+  line-height: 14px;
+  min-height: 32px;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  outline: none;
+  background: var(--color-brand);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px, rgba(0, 0, 0, 0.06) 0px 1px 2px;
+  color: var(--color-white);
+  font-weight: bold;
+}
+
+.btn-container button span:hover {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px, rgba(0, 0, 0, 0.05) 0px 4px 6px;
+}
+
+.btn-container button span div {
+  display: flex;
+  flex-flow: row;
+  -moz-box-pack: start;
+  place-content: stretch flex-start;
+  height: auto;
+  min-height: 0px;
+}

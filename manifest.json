@@ -1,0 +1,26 @@
+{
+    "manifest_version": 2,
+    "name": "Toggle Furigana - NS",
+    "version": "1.0",
+    "description": "Hides furigana in lessons by default. Click on them to view.",
+    "icons": {
+        "48": "icons/toggle-48.svg"
+    },
+    "browser_action": {
+        "default_popup": "popup/panel.html",
+        "default_icon": {
+            "16": "icons/page-16.png",
+            "32": "icons/page-32.png"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://app.nativshark.com/*"
+            ],
+            "js": [
+                "toggleFurigana.js"
+            ]
+        }
+    ]
+}
