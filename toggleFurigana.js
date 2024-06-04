@@ -1,16 +1,52 @@
 let isFuriganaHidden = false;
 let furiganas = null;
-let kanjiCheckChar;
 
-// smiley face ranking buttons, seen during flashcard/reviews.
-const smileyFaceSelectors = ["div.tzvGz", "div.tzvGz *"];
-// show answer button, seen during flashcard/reviews.
-const showAnswerButtonSelectors = [
-  ".kEKrUb > button.hhryVX",
-  ".kEKrUb > button.hhryVX *",
-];
-// Ok/got it button seen during lessons.
-const okLessonBtnSelectors = ["div.efvvTD *"];
+// https://app.nativshark.com/learn/vocabulary
+// When I mouse over any of the words it triggers a mutation and I can't
+// narrow down which class I need to target for the ignore.
+
+function handleMutations(mutationsList) {
+  for (let mutation of mutationsList) {
+    console.log(mutation);
+    if (shouldIgnoreMutation(mutation)) {
+      continue;
+    }
+
+    if (mutation.type === "childList" || mutation.type === "subtree") {
+      browser.storage.sync.get("isEnabled").then((result) => {
+        if (result.isEnabled) {
+          startHiding();
+        }
+      });
+    }
+  }
+}
+
+function shouldIgnoreMutation(mutation) {
+  if (
+    mutation.target.classList &&
+    (mutation.target.classList.contains("sc-pjstK") ||
+      mutation.target.classList.contains("sc-fzoydu") ||
+      mutation.target.classList.contains("sc-fzoLag"))
+  ) {
+    return true;
+  }
+}
+
+const observer = new MutationObserver(handleMutations);
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  browser.storage.sync.get("isEnabled").then((result) => {
+    if (result.isEnabled) {
+      startHiding();
+    }
+  });
+});
 
 /* Event listeners */
 
@@ -18,83 +54,14 @@ const okLessonBtnSelectors = ["div.efvvTD *"];
 document.addEventListener("keydown", (e) => {
   if (e.isComposing) return;
 
-  if (e.key === "r" && isFuriganaHidden) stopHiding();
+  if (e.shiftKey && e.key.toLowerCase() === "f" && isFuriganaHidden)
+    stopHiding();
   if (e.key === "f") startHiding();
 });
-
-document.addEventListener("click", (e) => {
-  const target = e.target;
-
-  if (isFuriganaHidden) {
-    if (iClickedOn(target, okLessonBtnSelectors)) {
-      let okLessonBtn = document.getElementsByClassName(
-        "LearnCard__CircleButtonSubtext-ygbxsd-11"
-      )[0];
-
-      if (okLessonBtn.innerHTML == "Play") hideFurigana();
-    }
-
-    if (iClickedOn(target, showAnswerButtonSelectors)) {
-      hideFurigana();
-      handleKanjiReviewCard();
-    }
-
-    if (iClickedOn(target, smileyFaceSelectors)) {
-      hideFurigana();
-    }
-  }
-});
-
-/* State logic */
-
-// Check what was clicked on by comparing by matching the provided selectors against the target.
-const iClickedOn = (target, selectors) => {
-  for (const selector of selectors) {
-    if (target.matches(selector)) return true;
-  }
-  return false;
-};
-
-const handleKanjiReviewCard = () => {
-  // check if the current card is a kanji card and get the kanji character.
-  kanjiCheckChar =
-    document?.getElementsByClassName("eHwwGg")[0]?.textContent || "";
-
-  if (kanjiCheckChar) {
-    let i = 0;
-
-    let finishedlooping = false;
-
-    function myloop() {
-      setTimeout(function () {
-        i++;
-
-        const bodyText = document.body.innerText || document.body.textContent;
-        let kanjiCount = bodyText.match(
-          new RegExp(kanjiCheckChar, "g") || []
-        ).length;
-
-        if (kanjiCount > 1) {
-          hideFurigana();
-          finishedlooping = true;
-
-          return;
-        }
-
-        if (i < 20 && !finishedlooping) {
-          myloop();
-        }
-      }, 500);
-    }
-
-    myloop();
-  }
-};
 
 /* show/reveal furigana logic */
 
 const startHiding = () => {
-  console.log("START HIDING");
   isFuriganaHidden = true;
   hideFurigana();
 };
@@ -128,24 +95,15 @@ const stopHiding = () => {
 /* link popup button clicks to function calls. */
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "startHiding") {
+  if (message.isEnabled) {
     startHiding();
-  }
-  if (message.action === "stopHiding") {
+  } else {
     stopHiding();
   }
 });
 
-// browser.webNavigation.onCompleted.addListener(function () {
-// });
-
-// browser.tabs.onUpdated.addListener(function (tabId, changeInfo) {
-//   if (changeInfo.status == "complete") {
-//   }
-// });
-
-/* 
-Next steps
-I want to create a toggle so the scripts execute on page load
-Also keep the keyboard shortcuts so it can be enabled/disabled on the fly.
-*/
+browser.storage.sync.get("isEnabled").then((result) => {
+  if (result.isEnabled) {
+    startHiding();
+  }
+});
